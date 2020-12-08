@@ -58,9 +58,16 @@ jobs:
             client_id: ${{ secrets.ID_CLIENT }}
             client_secret: ${{ secrets.SECRET_CLIENT }}
 
+        - name: Check json file existence
+          if: ${{ github.ref != 'refs/heads/master' && success() }}
+          id: check_files
+          uses: andstor/file-existence-action@v1
+          with:
+            files: "tools/csp_update_url.json, tools/bsp_update_url.json"
+
         - name: Generate-Import-Compile
           shell: bash
-          if: ${{ github.ref != 'refs/heads/master' && success() }}
+          if: ${{ github.ref != 'refs/heads/master' && success() && steps.check_files.outputs.files_exists == 'true' }}
           run: |
             cd ${{ github.workspace }}
             docker pull realthread/sdk_index:latest

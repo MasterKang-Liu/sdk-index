@@ -20,7 +20,7 @@ def get_build_result(cmd_pre, project_name):
         print("Error : {0} not exit.".format(project_path))
         return False
 
-    cmd = cmd_pre + " -cleanBuild '{0}' 1>build.log 2>/dev/null".format(project_name)
+    cmd = cmd_pre + " -cleanBuild '{0}' >build.log 2>&1".format(project_name)
     execute_command(cmd)
     build_result = judge_build_result()
 
@@ -40,7 +40,7 @@ def build_test(project_name):
 
 def judge_build_result():
     try:
-        with open("build.log",'r') as f:
+        with open("build.log", 'r') as f:
             log_info = f.readlines()
     except Exception as e:
         print("Error message : {0}".format(e))
@@ -52,10 +52,11 @@ def judge_build_result():
             print(line)
         if (line.find("region `ROM' overflowed") != -1) or (line.find("region `RAM' overflowed") != -1):
             print(line)
-        if line.find("Finished building target: rtthread.elf") != -1:
+        if line.find("Finished building target") != -1:
             build_result = True
             break
     execute_command("rm -rf build.log")
+
     return build_result
 
 
